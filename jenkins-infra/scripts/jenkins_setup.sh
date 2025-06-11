@@ -110,7 +110,7 @@ cat > /tmp/app-infra-job.xml << 'EOL'
       <jenkins.branch.BranchSource>
         <source class="jenkins.plugins.git.GitSCMSource" plugin="git">
           <id>app-infra-source</id>
-          <remote>https://github.com/elmorenox/microblog_VPC_deployment.git</remote>
+          <remote>https://github.com/elmorenox/demo-wl.git</remote>
           <credentialsId></credentialsId>
           <traits>
             <jenkins.plugins.git.traits.BranchDiscoveryTrait/>
