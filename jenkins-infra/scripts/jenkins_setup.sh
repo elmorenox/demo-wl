@@ -86,6 +86,7 @@ cat > /tmp/app-infra-job.xml << 'EOL'
       <dockerLabel></dockerLabel>
       <registry plugin="docker-commons"/>
     </org.jenkinsci.plugins.pipeline.modeldefinition.config.FolderConfig>
+    <jenkins.branch.NoTriggerBranchProperty/>
   </properties>
   <folderViews class="jenkins.branch.MultiBranchProjectViewHolder" plugin="branch-api">
     <owner class="org.jenkinsci.plugins.workflow.multibranch.WorkflowMultiBranchProject" reference="../.."/>
