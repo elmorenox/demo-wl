@@ -1,9 +1,6 @@
 pipeline {
     agent any
     
-    environment {
-        TF_VAR_ssh_key_name = 'your-key-name'  // Update this with your actual key name
-    }
     
     stages {
         stage('Checkout') {

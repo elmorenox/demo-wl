@@ -2,6 +2,10 @@
 # It assumes the VPC and basic networking already exists from jenkins-infra
 
 # Data sources to reference existing infrastructure
+provider "aws" {
+  region = var.region
+}
+
 data "aws_vpc" "existing_vpc" {
   filter {
     name   = "tag:Name"
