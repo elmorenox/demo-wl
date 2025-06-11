@@ -25,5 +25,5 @@ variable "ec2_ami" {
 variable "ssh_key_name" {
   description = "Name of the SSH key pair"
   type        = string
-  default = "demo"
+  default = "Workloads"
 }
