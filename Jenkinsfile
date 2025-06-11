@@ -40,7 +40,6 @@ pipeline {
         stage('Terraform Apply') {
             steps {
                 dir('app-infra') {
-                    input message: 'Deploy infrastructure?', ok: 'Deploy'
                     withCredentials([usernamePassword(credentialsId: 'aws-credentials', usernameVariable: 'AWS_ACCESS_KEY_ID', passwordVariable: 'AWS_SECRET_ACCESS_KEY')]) {
                         sh '''
                         export AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID

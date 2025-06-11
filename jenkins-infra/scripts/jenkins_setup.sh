@@ -74,61 +74,38 @@ java -jar /tmp/jenkins-cli.jar -s http://localhost:8080 -auth admin:$ADMIN_PASSW
   echo "WARNING: Failed to create AWS credentials"
 }
 
-# Create Multibranch Pipeline job for app infrastructure
+# Create regular Pipeline job for app infrastructure (not multibranch)
 echo "Creating app infrastructure pipeline..."
 cat > /tmp/app-infra-job.xml << 'EOL'
 <?xml version='1.1' encoding='UTF-8'?>
-<org.jenkinsci.plugins.workflow.multibranch.WorkflowMultiBranchProject plugin="workflow-multibranch">
+<flow-definition plugin="workflow-job">
   <actions/>
   <description>Pipeline for deploying application infrastructure</description>
-  <properties>
-    <org.jenkinsci.plugins.pipeline.modeldefinition.config.FolderConfig plugin="pipeline-model-definition">
-      <dockerLabel></dockerLabel>
-      <registry plugin="docker-commons"/>
-    </org.jenkinsci.plugins.pipeline.modeldefinition.config.FolderConfig>
-    <jenkins.branch.NoTriggerBranchProperty/>
-  </properties>
-  <folderViews class="jenkins.branch.MultiBranchProjectViewHolder" plugin="branch-api">
-    <owner class="org.jenkinsci.plugins.workflow.multibranch.WorkflowMultiBranchProject" reference="../.."/>
-  </folderViews>
-  <healthMetrics>
-    <com.cloudbees.hudson.plugins.folder.health.WorstChildHealthMetric plugin="cloudbees-folder">
-      <nonRecursive>false</nonRecursive>
-    </com.cloudbees.hudson.plugins.folder.health.WorstChildHealthMetric>
-  </healthMetrics>
-  <icon class="jenkins.branch.MetadataActionFolderIcon" plugin="branch-api">
-    <owner class="org.jenkinsci.plugins.workflow.multibranch.WorkflowMultiBranchProject" reference="../.."/>
-  </icon>
-  <orphanedItemStrategy class="com.cloudbees.hudson.plugins.folder.computed.DefaultOrphanedItemStrategy" plugin="cloudbees-folder">
-    <pruneDeadBranches>true</pruneDeadBranches>
-    <daysToKeep>-1</daysToKeep>
-    <numToKeep>-1</numToKeep>
-  </orphanedItemStrategy>
+  <keepDependencies>false</keepDependencies>
+  <properties/>
+  <definition class="org.jenkinsci.plugins.workflow.cps.CpsScmFlowDefinition" plugin="workflow-cps">
+    <scm class="hudson.plugins.git.GitSCM" plugin="git">
+      <configVersion>2</configVersion>
+      <userRemoteConfigs>
+        <hudson.plugins.git.UserRemoteConfig>
+          <url>https://github.com/elmorenox/demo-wl.git</url>
+        </hudson.plugins.git.UserRemoteConfig>
+      </userRemoteConfigs>
+      <branches>
+        <hudson.plugins.git.BranchSpec>
+          <name>*/main</name>
+        </hudson.plugins.git.BranchSpec>
+      </branches>
+      <doGenerateSubmoduleConfigurations>false</doGenerateSubmoduleConfigurations>
+      <submoduleCfg class="empty-list"/>
+      <extensions/>
+    </scm>
+    <scriptPath>Jenkinsfile</scriptPath>
+    <lightweight>true</lightweight>
+  </definition>
   <triggers/>
   <disabled>false</disabled>
-  <sources class="jenkins.branch.MultiBranchProject$BranchSourceList" plugin="branch-api">
-    <data>
-      <jenkins.branch.BranchSource>
-        <source class="jenkins.plugins.git.GitSCMSource" plugin="git">
-          <id>app-infra-source</id>
-          <remote>https://github.com/elmorenox/demo-wl.git</remote>
-          <credentialsId></credentialsId>
-          <traits>
-            <jenkins.plugins.git.traits.BranchDiscoveryTrait/>
-          </traits>
-        </source>
-        <strategy class="jenkins.branch.DefaultBranchPropertyStrategy">
-          <properties class="empty-list"/>
-        </strategy>
-      </jenkins.branch.BranchSource>
-    </data>
-    <owner class="org.jenkinsci.plugins.workflow.multibranch.WorkflowMultiBranchProject" reference="../.."/>
-  </sources>
-  <factory class="org.jenkinsci.plugins.workflow.multibranch.WorkflowBranchProjectFactory">
-    <owner class="org.jenkinsci.plugins.workflow.multibranch.WorkflowMultiBranchProject" reference="../.."/>
-    <scriptPath>Jenkinsfile</scriptPath>
-  </factory>
-</org.jenkinsci.plugins.workflow.multibranch.WorkflowMultiBranchProject>
+</flow-definition>
 EOL
 
 echo "Creating job 'app-infrastructure-deployment'..."
