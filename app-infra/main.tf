@@ -38,33 +38,10 @@ resource "aws_subnet" "private_subnet" {
   }
 }
 
-# Elastic IP for NAT Gateway
-resource "aws_eip" "nat_eip" {
-  domain = "vpc"
-  depends_on = [data.aws_internet_gateway.existing_igw]
-}
-
-# NAT Gateway
-resource "aws_nat_gateway" "nat_gw" {
-  allocation_id = aws_eip.nat_eip.id
-  subnet_id     = data.aws_subnet.existing_public_subnet.id
-
-  tags = {
-    Name = "App-NAT-GW"
-  }
-
-  depends_on = [data.aws_internet_gateway.existing_igw]
-}
-
 # Private Route Table
 resource "aws_route_table" "private_rt" {
   vpc_id = data.aws_vpc.existing_vpc.id
-
-  route {
-    cidr_block     = "0.0.0.0/0"
-    nat_gateway_id = aws_nat_gateway.nat_gw.id
-  }
-
+  # Remove the route block entirely for now
   tags = {
     Name = "Private-Route-Table"
   }
@@ -114,10 +91,10 @@ resource "aws_security_group" "app_sg" {
   vpc_id      = data.aws_vpc.existing_vpc.id
 
   ingress {
-    from_port       = 22
-    to_port         = 22
-    protocol        = "tcp"
-    security_groups = [aws_security_group.web_sg.id]
+    from_port   = 22
+    to_port     = 22
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
   }
 
   ingress {
@@ -206,10 +183,10 @@ resource "aws_instance" "app_server" {
   ami                    = var.ec2_ami
   instance_type          = "t3.micro"
   key_name               = var.ssh_key_name
-  subnet_id              = aws_subnet.private_subnet.id
+  subnet_id              = data.aws_subnet.existing_public_subnet.id
   vpc_security_group_ids = [aws_security_group.app_sg.id]
-  private_ip             = "10.0.2.100"
-
+  private_ip             = "10.0.1.101"
+  
   user_data = base64encode(<<-EOF
               #!/bin/bash
               sudo apt update
